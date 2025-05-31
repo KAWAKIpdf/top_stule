@@ -62,7 +62,7 @@ except Exception as e:
     logger.error(f"❌ Ошибка загрузки модели: {str(e)}")
     raise
 
-TELEGRAM_TOKEN = "8115857339:AAE_5D17U0wpd3daO3J7kfmmX1bmxZdSQAc"
+TELEGRAM_TOKEN = ""
 bot = TeleBot(TELEGRAM_TOKEN)
 
 # Сессии
