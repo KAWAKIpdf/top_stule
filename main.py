@@ -50,7 +50,7 @@ try:
     model_name = "ViT-B-32"
     pretrained = "laion2b_s34b_b79k"
     model, _, preprocess = open_clip.create_model_and_transforms(model_name, pretrained=pretrained)
-    checkpoint_path = r"C:\Users\KAWAKI\Desktop\иишка\AI work\fashion_clip_finetuned_epoch1.pt"
+    checkpoint_path = r""
 
     if not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f"Файл модели не найден: {checkpoint_path}")
