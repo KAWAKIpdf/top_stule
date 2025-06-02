@@ -9,14 +9,13 @@ import torch
 import open_clip
 from database import init_db, save_user_style, save_style_vector, get_user_styles, check_duplicate_image
 
-# Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Стили с русскими названиями
+
 fashion_styles = {
     "avangard": "авангард",
     "babiy": "бабий стиль",
@@ -44,7 +43,6 @@ fashion_styles = {
     "vintazh": "винтаж"
 }
 
-# Инициализация модели
 try:
     logger.info("🔄 Загружаем модель...")
     model_name = "ViT-B-32"
@@ -129,7 +127,7 @@ def handle_photo(message):
     temp_file_path = None
 
     try:
-        # Скачивание фото
+    
         file_info = bot.get_file(message.photo[-1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
@@ -138,12 +136,10 @@ def handle_photo(message):
             tmp_file.write(downloaded_file)
             temp_file_path = tmp_file.name
 
-        # Проверка хеша
         image_hash = calculate_image_hash(temp_file_path)
         if not image_hash:
             raise ValueError("Не удалось вычислить хеш изображения")
 
-        # Проверка на дубликаты в БД
         matched_style = check_duplicate_image(user_id, image_hash)
         if matched_style:
             bot.send_message(
@@ -169,14 +165,13 @@ def handle_photo(message):
             probs = similarity.softmax(dim=-1)[0]
             top_probs, top_indices = torch.topk(probs, 3)
 
-        # Сохраняем топ-3 стиля с вероятностями
+        
         top_styles = []
         for i in range(3):
             style = list(fashion_styles.keys())[top_indices[i]]
             prob = round(top_probs[i].item() * 100, 1)
             top_styles.append((style, prob))
 
-        # Сохраняем сессию
         user_sessions[user_id] = {
             'features': image_features,
             'image_path': temp_file_path,
@@ -185,19 +180,17 @@ def handle_photo(message):
             'top_styles': top_styles
         }
 
-        # Формируем сообщение с топ-3 стилями (стили выделены жирным)
+    
         styles_message = "\n".join(
             [f"• *{fashion_styles[style]}*: {prob}%" for style, prob in top_styles]
         )
 
-        # Создаем клавиатуру
         markup = types.InlineKeyboardMarkup()
         markup.row(
             types.InlineKeyboardButton("✅ Подходит", callback_data=f"accept_{top_styles[0][0]}"),
             types.InlineKeyboardButton("❌ Не подходит", callback_data="dislike")
         )
-
-        # Отправляем результат
+        
         sent_msg = bot.send_message(
             message.chat.id,
             f"🎨 Топ-3 предполагаемых стиля:\n{styles_message}\n\nПервый вариант вам подходит?",
@@ -295,7 +288,6 @@ def handle_dislike_style(call):
         if not top_styles:
             raise ValueError("Не найдены стили для выбора")
 
-        # Формируем сообщение с топ-3 стилями (стили выделены жирным)
         styles_message = "\n".join(
             [f"• *{fashion_styles[style]}*: {prob}%" for style, prob in top_styles]
         )
