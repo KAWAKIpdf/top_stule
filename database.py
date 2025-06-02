@@ -6,13 +6,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# Инициализация базы данных
 def init_db():
     try:
         with sqlite3.connect('fashion_styles.db') as conn:
             cursor = conn.cursor()
 
-            # Таблица пользователей и их стилей
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS user_styles (
                     user_id INTEGER NOT NULL,
@@ -22,7 +20,7 @@ def init_db():
                 )
             ''')
 
-            # Таблица для хранения векторов стилей
+
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS style_vectors (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,8 +39,6 @@ def init_db():
         logger.error(f"❌ Ошибка инициализации БД: {str(e)}")
         raise
 
-
-# Сохранение стиля пользователя
 def save_user_style(user_id: int, style: str) -> None:
     try:
         with sqlite3.connect('fashion_styles.db') as conn:
@@ -56,17 +52,13 @@ def save_user_style(user_id: int, style: str) -> None:
         logger.error(f"❌ Ошибка сохранения стиля пользователя: {str(e)}")
         raise
 
-
-# Сохранение вектора стиля
 def save_style_vector(user_id: int, style: str, vector: bytes, image_hash: str) -> None:
     try:
         with sqlite3.connect('fashion_styles.db') as conn:
             cursor = conn.cursor()
 
-            # Сначала сохраняем стиль пользователя
             save_user_style(user_id, style)
 
-            # Затем сохраняем вектор
             cursor.execute(
                 '''INSERT INTO style_vectors 
                 (user_id, style, vector, image_hash) 
@@ -80,8 +72,6 @@ def save_style_vector(user_id: int, style: str, vector: bytes, image_hash: str) 
         logger.error(f"❌ Ошибка сохранения вектора стиля: {str(e)}")
         raise
 
-
-# Получение стилей пользователя
 def get_user_styles(user_id: int) -> List[Dict]:
     try:
         with sqlite3.connect('fashion_styles.db') as conn:
@@ -98,8 +88,6 @@ def get_user_styles(user_id: int) -> List[Dict]:
         logger.error(f"❌ Ошибка получения стилей пользователя: {str(e)}")
         return []
 
-
-# Проверка на дубликаты изображений
 def check_duplicate_image(user_id: int, image_hash: str) -> Optional[str]:
     try:
         with sqlite3.connect('fashion_styles.db') as conn:
@@ -116,7 +104,7 @@ def check_duplicate_image(user_id: int, image_hash: str) -> Optional[str]:
         return None
 
 
-# Дополнительные полезные функции
+
 def get_user_recent_style(user_id: int) -> Optional[str]:
     """Получение последнего стиля пользователя"""
     try:
